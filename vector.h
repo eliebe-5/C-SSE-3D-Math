@@ -1,17 +1,7 @@
 #include <math.h>
+#include <xmmintrin.h>
+#include <smmintrin.h>
 
-typedef struct
-{
-  float x;
-  float y;
-} v2;
-
-typedef struct
-{
-  float x;
-  float y;
-  float z;
-} v3;
 
 typedef struct
 {
@@ -21,45 +11,24 @@ typedef struct
   float w;
 } v4;
 
-static inline v4 v3_to_v4(v3 one) { v4 res; res.x = one.x; res.y = one.y; res.z = one.z; res.w = 1; return res; }
+union xmm_v4
+{
+	v4 v;
+	__m128 sse;
+};
 
-static inline v3 v4_to_v3(v4 one) { v3 res; res.x = one.x; res.y = one.y; res.z = one.z; return res; }
+//static inline v4 add_v4(v4 one, v4 two) { v4 res; res.x = one.x + two.x; res.y = one.y + two.y; res.z = one.z + two.z; res.w = one.w + two.w; return res; }
 
+static inline __m128 set_v4(float x, float y, float z, float w) { return _mm_setr_ps(x, y, z, w); };
 
-static inline v2 add_v2(v2 one, v2 two) { v2 res; res.x = one.x + two.x; res.y = one.y + two.y; return res; }
+static inline __m128 add_v4(__m128 one, __m128 two) { return _mm_add_ps(one, two); }
 
-static inline v2 sub_v2(v2 one, v2 two) { v2 res; res.x = one.x - two.x; res.y = one.y - two.y; return res; }
+static inline __m128 sub_v4(__m128 one, __m128 two) { return _mm_sub_ps(one, two); }
 
-static inline v2 mult_v2_f(v2 one, float two) { v2 res; res.x = one.x * two; res.y = one.y * two; return res; }
+static inline __m128 mult_v4_f(__m128 one, const float two) { return _mm_mul_ps(one, _mm_load_ps1(&two)); }
 
-static inline float dot_v2(v2 one, v2 two) { float res; res = one.x * two.x + one.y * two.y; return res; }
+static inline float dot_v4(__m128 one, __m128 two) { _mm_cvtss_f32(_mm_dp_ps(one, two, 0x71)); }
 
-static inline v2 div_v2_f(v2 one, float two) { v2 res; res.x = one.x / two; res.y = one.y / two; return res; }
+static inline __m128 div_v4_f(__m128 one, const float two) { const float div = 1 / two; return _mm_mul_ps(one, _mm_load_ps1(&div)); }
 
-static inline float mag_v2(v2 one) { float res; res = (float)sqrt(one.x*one.x + one.y*one.y);  return res; }
-
-static inline v3 add_v3(v3 one, v3 two) { v3 res; res.x = one.x + two.x; res.y = one.y + two.y; res.z = one.z + two.z; return res; }
-
-static inline v3 sub_v3(v3 one, v3 two) { v3 res; res.x = one.x - two.x; res.y = one.y - two.y; res.z = one.z - two.z; return res; }
-
-static inline v3 mult_v3_f(v3 one, float two) { v3 res; res.x = one.x * two; res.y = one.y * two; res.z = one.z * two; return res; }
-
-static inline float dot_v3(v3 one, v3 two) { float res; res = one.x * two.x + one.y * two.y + one.z * two.z; return res; }
-
-static inline v3 cross_v3(v3 one, v3 two) { v3 res; res.x = one.y*two.z - one.z*two.y; res.y = one.z*two.x - one.x*two.z; res.y = one.x*two.y - one.y*two.x; return res; }
-
-static inline v3 div_v3_f(v3 one, float two) { v3 res; res.x = one.x / two; res.y = one.y / two; res.z = one.z / two; return res; }
-
-static inline float mag_v3(v3 one) { float res; res = (float)sqrt(one.x*one.x + one.y*one.y + one.z*one.z);  return res; }
-
-static inline v4 add_v4(v4 one, v4 two) { v4 res; res.x = one.x + two.x; res.y = one.y + two.y; res.z = one.z + two.z; res.w = one.w + two.w; return res; }
-
-static inline v4 sub_v4(v4 one, v4 two) { v4 res; res.x = one.x - two.x; res.y = one.y - two.y; res.z = one.z - two.z; res.w = one.w - two.w; return res; }
-
-static inline v4 mult_v4_f(v4 one, float two) { v4 res; res.x = one.x * two; res.y = one.y * two; res.z = one.z * two; res.w = one.w * two; return res; }
-
-static inline float dot_v4(v4 one, v4 two) { float res; res = one.x * two.x + one.y * two.y + one.z * two.z + one.w * two.w; return res; }
-
-static inline v4 div_v4_f(v4 one, float two) { v4 res; res.x = one.x / two; res.y = one.y / two; res.z = one.z / two; res.w = one.w / two; return res; }
-
-static inline float mag_v4(v4 one) { float res; res = (float)sqrt(one.x*one.x + one.y*one.y + one.z*one.z + one.w*one.w);  return res; }
+static inline float mag_v4(__m128 one) { return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(one, one, 0x71))); }
