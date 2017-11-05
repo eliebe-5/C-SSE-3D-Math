@@ -11,6 +11,8 @@ struct v4
   float w;
 };
 
+//Using this union you can use all the vector functions by using the sse part, and easily extract the data as floats. Unions are magic.
+
 union xmm_v4
 {
   struct v4 v;
