@@ -1,14 +1,7 @@
 #include "vector.h"
 #include "matrix.h"
 
-static inline v4 transform_v4(m4x4 one, v4 two)
+static inline __m128 transform_v4(struct _m128x4 one, __m128 two)
 {
-  v4 res;
-
-  res.x = one.m00*two.x + one.m01*two.y + one.m02*two.z + one.m03*two.w;
-  res.y = one.m10*two.x + one.m11*two.y + one.m12*two.z + one.m13*two.w;
-  res.z = one.m20*two.x + one.m21*two.y + one.m22*two.z + one.m23*two.w;
-  res.w = one.m30*two.x + one.m31*two.y + one.m32*two.z + one.m33*two.w;
-  
-  return res;
+  return _mm_setr_ps(dot_v4(one.xmm0, two), dot_v4(one.xmm1, two), dot_v4(one.xmm2, two), dot_v4(one.xmm3, two));
 }
