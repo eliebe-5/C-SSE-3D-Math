@@ -89,8 +89,8 @@ static inline struct _m128x4 rot_m4x4(float x, float y, float z)
   mz.sse = identity_m4x4();
 
   mx.m.m11 = cos(x); mx.m.m12 = -sin(x); mx.m.m21 = sin(x); mx.m.m22 = cos(x);
-  my.m.m00 = cos(y); my.m.m02 = sin(y); my.m.m02 = -sin(y); my.m.m22 = cos(y);
-  mz.m.m00 = cos(z); mz.m.m01 = -sin(z); mz.m.m01 = sin(z); mx.m.m11 = cos(z);
+  my.m.m00 = cos(y); my.m.m02 = sin(y); my.m.m20 = -sin(y); my.m.m22 = cos(y);
+  mz.m.m00 = cos(z); mz.m.m01 = -sin(z); mz.m.m10 = sin(z); mx.m.m11 = cos(z);
 	
   res = mult_m4x4(mult_m4x4(mx.sse, my.sse), mz.sse);
 
