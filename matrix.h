@@ -14,6 +14,8 @@ struct _m128x4
   __m128 xmm0, xmm1, xmm2, xmm3;
 };
 
+//Using this union you can use all the matrix functions by using the sse part, and easily extract the data as floats.
+
 union xmm_m4x4
 {
   struct m4x4 m;
@@ -60,6 +62,10 @@ static inline struct _m128x4 mult_m4x4(struct _m128x4 one, struct _m128x4 two)
   
   return res;
 }
+
+/*
+	This could probably be done nicer and faster with sse, but it is not really math, so it's probably not too slow.
+*/
 
 static inline struct _m128x4 transpose_m4x4(struct _m128x4 one)
 {
